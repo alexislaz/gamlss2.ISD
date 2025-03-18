@@ -8,12 +8,19 @@
 #' @param lower Lowest size limit (does not need to equal `min(size)`)
 #' @param upper Highest size limit (does not need to equal `max(size)`)
 #'
-#' @return A `gamlss2` family object
+#' @return A `gamlss2.family` object
 #'
 #' @export
 #'
 #' @examples
-#' NA
+#'
+#' # simulate a dataset of 1000 sizes coming from an ISD with b = -2, and range of sizes bounded between 1 and 1000
+#' d = data.frame(size = rPLB(1000, -2, 1, 1000))
+#'
+#' # estimate the exponent 'b'
+#' m = gamlss2(size ~ 1, data = d, family = bPL(counts = 1, lower = 1, upper = 1000))
+#'
+#' summary(m)
 #'
 #' @references Edwards, A.M., Robinson, J.P.W., Plank, M.J., Baum, J.K. and Blanchard, J.L. (2017), Testing and recommending methods for fitting size spectra to data. Methods Ecol Evol, 8: 57-67. https://doi.org/10.1111/2041-210X.12641
 #' @references Edwards, A. M., Robinson, J. P. W., Blanchard, J. L., Baum, J. K., & Plank, M. J. (2020). Accounting for the bin structure of data removes bias when fitting size spectra. Marine Ecology Progress Series, 636, 19–33. https://www.jstor.org/stable/26920653

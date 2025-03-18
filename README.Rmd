@@ -22,7 +22,7 @@ The goal of gamlss2.ISD is to estimate the exponent of the Individual Size Distr
 
 # Installation
 
-The `gamlss2.dist` package requires installation of `gamlss2`:
+The `gamlss2.ISD` package requires installation of `gamlss2`:
 ```{r, eval = FALSE}
 install.packages("gamlss2",
   repos = c("https://gamlss-dev.R-universe.dev",
@@ -54,7 +54,7 @@ gamlss2(size ~ fac + s(x1, x2) + s(x3, by = fac) + s(id, bs = "re"),
 # Examples
 
 First load relevant packages:
-```{r load, eval = FALSE}
+```{r load, message = FALSE, warning = FALSE, include = TRUE}
 library(dplyr)
 library(ggplot2)
 library(gamlss2)
@@ -72,19 +72,19 @@ library(gamlss2.ISD)
 
 We can simulate a dataset of body sizes from the bounded Power-Law distribution using the `rPLB` from the `sizeSpectra` package:
 
-```{r ex1_r, eval = FALSE}
+```{r ex1_r, message = FALSE, warning = FALSE, include = TRUE}
 d = data.frame(size = rPLB(1000, -2, 1, 1000))  # 1000 body sizes from ISD with b = -2 bounded in [1, 1000]
 ```
 
 And then estimate the exponent using GAMLSS:
 
-```{r ex1_m, eval = FALSE}
+```{r ex1_m, message = FALSE, warning = FALSE, include = TRUE, results = "hide"}
 m = gamlss2(size ~ 1, 
             data = d, 
             family = bPL(1, 1, 1000)) # all counts = 1, range [1, 1000] as simulated
 ```
 
-```{r_ex1_m_summary, eval = TRUE}
+```{r ex1_m_summary, message = FALSE, warning = FALSE, include = TRUE}
 summary(m)
 ```
 
@@ -93,7 +93,7 @@ summary(m)
 
 As a more complicated example, we can simulate body sizes for different populations with different characteristics:
 
-```{r ex2_r, eval = FALSE}
+```{r ex2_r, message = FALSE, warning = FALSE, include = TRUE}
 # population-specific size ranges
 pop1_size_range = c(10, 800)
 pop2_size_range = c(20, 1000)
@@ -120,22 +120,27 @@ dat$pop = factor(dat$pop) # convert to factor for models
 
 And then estimate the exponents (b) for each population:
 
-```{r ex2_m1, eval = FALSE}
+```{r ex2_m1, message = FALSE, warning = FALSE, include = TRUE, results = "hide"}
 m = gamlss2(size ~ pop, 
             data = dat, 
             family = bPL(1, dat$mn, dat$mx))
+```
 
+Timing:
+```{r ex2_m1_time, message = FALSE, warning = FALSE, include = TRUE}
 summary(m)$elapsed # seconds of model fitting
 ```
 
-```{r ex2_m1_summary, eval = TRUE}
+See the estimates:
+
+```{r ex2_m1_summary, message = FALSE, warning = FALSE, include = TRUE}
 predict(m, newdata = data.frame(pop = c("pop1", "pop2", "pop3")), se.fit = TRUE)
 ```
 
 
 Alternatively, for faster fitting, we can aggregate equal sizes with their respective abundance:
 
-```{r ex2_m2, eval = FALSE}
+```{r ex2_m2, message = FALSE, warning = FALSE, include = TRUE, results = "hide"}
 dat_counts = dat |> 
   group_by(pop, size, mn, mx) |>
   summarize(n = n()) |>
@@ -144,29 +149,34 @@ dat_counts = dat |>
 m = gamlss2(size ~ pop, 
             data = dat_counts, 
             family = bPL(dat_counts$n, dat_counts$mn, dat_counts$mx))
+```
 
+Reduced model fitting time:
+```{r ex2_m2_time, message = FALSE, warning = FALSE, include = TRUE}
 summary(m)$elapsed
 ```
 
-```{r ex2_m2_summary, eval = TRUE}
+Identical estimates:
+```{r ex2_m2_summary, message = FALSE, warning = FALSE, include = TRUE}
 predict(m, newdata = data.frame(pop = c("pop1", "pop2", "pop3")), se.fit = TRUE)
 ```
 
 We can, also, utilize the random effects structure that `gamlss2` offers:
 
-```{r ex2_m3, eval = FALSE}
+```{r ex2_m3, message = FALSE, warning = FALSE, include = TRUE, results = "hide"}
 m = gamlss2(size ~ s(pop, bs = "re"), 
             data = dat_counts, 
             family = bPL(dat_counts$n, dat_counts$mn, dat_counts$mx))
 ```
 
-```{r ex2_m3_summary, eval = TRUE}
+Where we obtain similar estimates:
+```{r ex2_m3_summary, message = FALSE, warning = FALSE, include = TRUE}
 predict(m, newdata = data.frame(pop = factor(levels(m$model$pop), levels(m$model$pop))), se.fit = TRUE)
 ```
 
-And visualize using the built-in `plot.gamlss2`:
+And we can, also, visualize using the built-in `plot.gamlss2`:
 
-```{r ex2_m3_plot, eval = TRUE}
+```{r ex2_m3_plot, message = FALSE, warning = FALSE, include = TRUE}
 plot(m)
 ```
 
@@ -175,7 +185,7 @@ plot(m)
 
 Finally, as a more complex example, we can simulate a predictor that affects the exponent of the ISD while using random intercepts:
 
-```{r ex3_r, eval = FALSE}
+```{r ex3_r, message = FALSE, warning = FALSE, include = TRUE}
 # setup global intercept and slope and a hardcoded 'random' intercept
 set.seed(1)
 
@@ -202,8 +212,8 @@ y = (X %*% c(intercept, slope)) + (Z0 %*% b0) + rnorm(length(x), 0, 0.01)
 dat = data.frame(y = y, x = x, g = g)
 ```
 
-```{r ex3_plot, eval = TRUE}
-# visualize the dependence of the exponent on 'x'
+Visualize the dependence of the exponent on 'x':
+```{r ex3_plot, message = FALSE, warning = FALSE, include = TRUE}
 ggplot(dat) + 
   theme_classic(base_size = 15) + 
   geom_point(aes(x = x, y = y, colour = g)) + 
@@ -212,20 +222,18 @@ ggplot(dat) +
 ```
 
 
-```{r ex3_sim, eval = FALSE}
-# simulate sizes from the grid of exponents
+And now simulate actual individual sizes from the grid of exponents:
+```{r ex3_sim, message = FALSE, warning = FALSE, include = TRUE}
 dat_sizes = do.call(rbind,
                     Map(function(beta, x, g) 
                       data.frame(g = g, 
                                  x = x, 
-                                 size = sizeSpectra::rPLB(500, beta, 1, 1000)), 
+                                 size = rPLB(500, beta, 1, 1000)), 
                       dat$y, dat$x, dat$g))
 ```
 
-
-```{r ex3_sim_plot, eval = FALSE}
-# visualize our raw data of individual sizes
-# pop2 has a steeper size spectra "slope" (b) and, hence, more small individuals
+And visualize our simulated sizes. We note that "pop2" has a steeper size spectra "slope" (b) and, hence, more smaller individuals:
+```{r ex3_sim_plot, message = FALSE, warning = FALSE, include = TRUE}
 ggplot(dat_sizes) + 
   theme_classic(base_size = 15) + 
   facet_wrap(vars(g)) + 
@@ -233,21 +241,22 @@ ggplot(dat_sizes) +
 ```
 
 
-And fit the mixed model:
-```{r ex3_m, eval = FALSE}
+Fit the mixed model:
+```{r ex3_m, message = FALSE, warning = FALSE, include = TRUE, results = "hide"}
 # run model
 m = gamlss2(size ~ x + re(fixed = ~x, random = ~1|g), data = dat_sizes, family = bPL(1, 1, 1000))
 ```
 
-```{r ex3_m_summary, eval = TRUE}
-summary(m)  # summary of the fit (intercept and slope)
-```
+Inspect the model fit:
 
-```{r ex3_m_diagnostics, eval = TRUE}
+```{r ex3_m_diagnostics, message = FALSE, warning = FALSE, include = TRUE}
 plot(m)  # built-in diagnostics
 ```
 
-```{r ex3_m_coefs, eval = TRUE}
+
+And retrieve the estimated intercepts and slopes:
+
+```{r ex3_m_coefs, message = FALSE, warning = FALSE, include = TRUE}
 # the estimated intercepts are:
 coef(specials(m)$model)[, 1] + coef(m)[1]
 # the actual intercepts are:
@@ -266,7 +275,7 @@ We'll use the built-in `IBTS_data` dataset of the `sizeSpectra` package with rec
 
 
 First, format the dataset:
-```{r ibts_repl_fmt, eval = FALSE}
+```{r ibts_repl_fmt, message = FALSE, warning = FALSE, include = TRUE}
 dat = IBTS_data |>
   group_by(Year) |>
   mutate(mn = min(bodyMass), mx = max(bodyMass)) |> # in Edwards et al. 2020, min and max sizes are separated by year analysis
@@ -274,22 +283,28 @@ dat = IBTS_data |>
   ungroup()
 ```
 
-Fit the GAMLSS models:
-```{r ibts_repl_gamlss, eval = FALSE}
-# fit model wrt Year
-# binning=TRUE to speedup fitting
+Fit the GAMLSS models. We use the `binning = TRUE` argument of `gamlss2_control` to fit model more efficiently. First, a model only with a random effect for Year:
+```{r ibts_repl_gamlss_year, message = FALSE, warning = FALSE, include = TRUE, results = "hide"}
 m_gam_year = gamlss2(bodyMass ~ s(Year, bs = "re"), 
                 data = dat, 
                 family = bPL(dat$Number, dat$mn, dat$mx), 
                 control = gamlss2_control(binning = TRUE)) 
+```
 
-# fit, also, a model accounting for a simple inter-species effect on 'b'
+
+And we, also, fit a model accounting for a simple inter-species effect on 'b':
+
+```{r ibts_repl_gamlss_year_species, message = FALSE, warning = FALSE, include = TRUE, results = "hide"}
 m_gam_year_species = gamlss2(bodyMass ~ s(Year, bs = "re") +  s(SpecCode, bs = "re"), 
                              data = dat, 
                              family = bPL(dat$Number, dat$mn, dat$mx), 
                              control = gamlss2_control(binning = TRUE))
+```
 
-# collect predicted effects from both models (in a similar notation to `sizeSpectra`)
+
+And finally, collect predicted effects from both models (in a similar notation to `sizeSpectra`):
+
+```{r ibts_repl_gamlss_eff, message = FALSE, warning = FALSE, include = TRUE}
 eff_gam_year = m_gam_year$results$effects[[1]] |>
   mutate(b = fit + coef(m_gam_year),
          confMin = lower + coef(m_gam_year),
@@ -301,16 +316,18 @@ eff_gam_year_species = m_gam_year_species$results$effects[[1]] |>
 ```
 
 
-Also fit the `brm` model:
-```{r ibts_repl_brm, eval = FALSE}
-# using the truncated Pareto parameterized with Stan in the `isdbayes` package
+Also, fit the `brm` model, using the truncated Pareto parameterized with Stan in the `isdbayes` package:
+```{r ibts_repl_brm, message = FALSE, warning = FALSE, include = TRUE, results = "hide"}
 m_bayes_year = brm(bodyMass | vreal(Number, mn, mx) ~ (1|Year), 
                    data = dat,
                    stanvars = stanvars,
                    family = paretocounts(),
-                   chains = 1, iter = 1000)
+                   chains = 1, iter = 1000)  # need to increase `chains` and `iter` for better estimates
+```
 
-# collect the effects of the `brm` fit (in a similar notation to `sizeSpectra`)
+
+And, once again, collect the effects of the `brm` fit (in a similar notation to `sizeSpectra`):
+```{r ibts_repl_brm_eff, message = FALSE, warning = FALSE, include = TRUE}
 eff_bayes_year = ranef(m_bayes_year)[[1]][, , "Intercept"] |>
   as.data.frame() |>
   mutate(b = Estimate + fixef(m_bayes_year)[, "Estimate"],
@@ -321,7 +338,7 @@ eff_bayes_year = ranef(m_bayes_year)[[1]][, , "Intercept"] |>
 
 
 Finally, replicate the results of Figure 8 from @edwards2020. (NOTE: `sizeSpectra::eightMethods.count` creates figures by default in the home directory! take care to delete them afterwards!)
-```{r ibts_repl_mle, eval = FALSE}
+```{r ibts_repl_mle, message = FALSE, warning = FALSE, include = TRUE}
 # replicate the MLE of 'b' from Edwards et al. 2020 using `eightMethods.count` 
 eff_mle = do.call(rbind, 
                 lapply(split(IBTS_data, IBTS_data$Year), 
@@ -329,7 +346,7 @@ eff_mle = do.call(rbind,
 ```
 
 And plot all the estimates. After plotting we can see the almost identical estimates between GAMLSS, the bayesian fit, and the MLE from Edwards et al. 2020. Accounting for the different species, though, changes the estimated exponents.
-```{r ibts_repl_plot, eval = TRUE}
+```{r ibts_repl_plot, message = FALSE, warning = FALSE, include = TRUE, fig.dim = c(20, 12)}
 # collect both estimations in a single dataset and plot predictions of 'b'
 rbind(cbind(method = "gamlss - only year", eff_gam_year[, c("Year", "b", "confMin", "confMax")]), 
       cbind(method = "gamlss - year and species", eff_gam_year_species[, c("Year", "b", "confMin", "confMax")]),
@@ -337,13 +354,13 @@ rbind(cbind(method = "gamlss - only year", eff_gam_year[, c("Year", "b", "confMi
       cbind(method = "Edwards 2020", eff_mle[, c("Year", "b", "confMin", "confMax")])) |>
   ggplot() + 
   theme_classic(base_size = 15) + 
-  geom_point(aes(x = Year, y = b, colour = method), position = position_dodge(width = 0.25)) + 
-  geom_errorbar(aes(x = Year, ymin = confMin, ymax = confMax, colour = method), width = 0.0, position = position_dodge(width = 0.25))
+  geom_point(aes(x = Year, y = b, colour = method), position = position_dodge(width = 0.75)) + 
+  geom_errorbar(aes(x = Year, ymin = confMin, ymax = confMax, colour = method), width = 0.0, position = position_dodge(width = 0.75))
 ```
 
 
-Besides this simple random year intercept models, we can, also, fit a more complex model using the `IBTS_data` dataset. First clean-up the data a bit:
-```{r ibts_new, eval = FALSE}
+Besides this simple random year intercept model, we can, also, fit a more complex model using the `IBTS_data` dataset. First clean-up the data a bit:
+```{r ibts_new, message = FALSE, warning = FALSE, include = TRUE}
 species_selection = c(105865, 126417, 126436, 127139, 126461, 126484, 127023, 127160, 105923) # select a few species
 dat = IBTS_data |>
   group_by(SpecCode) |> 
@@ -354,8 +371,7 @@ dat = IBTS_data |>
 ```
 
 Now fit a more sophisticated GAM:
-```{r ex4_m, eval = FALSE}
-# binning=TRUE for faster fitting
+```{r ex4_m, message = FALSE, warning = FALSE, include = TRUE, results = "hide"}
 m = gamlss2(bodyMass ~ species + s(Year, by = species, k = 5), 
             data = dat, 
             family = bPL(dat$Number, dat$mn, dat$mx),
@@ -365,7 +381,7 @@ m = gamlss2(bodyMass ~ species + s(Year, by = species, k = 5),
 
 And visualize the effects:
 
-```{r ex4_eff, eval = FALSE}
+```{r ex4_eff, message = FALSE, warning = FALSE, include = TRUE}
 prediction_grid = expand.grid(Year = sort(unique(m$model$Year)),
                               species = factor(levels(m$model$species), levels(m$model$species)))
 predictions = cbind(prediction_grid, 
@@ -374,14 +390,13 @@ predictions = cbind(prediction_grid,
                             terms = c("(Intercept)", "Year", "species"),
                             nogrep = FALSE))
 predictions$species = specCodeNames$species[match(as.character(predictions$species), specCodeNames$speccode)] # use species scientific names
-```
 
-```{r ex4_plot, eval = TRUE}
 ggplot(predictions) + 
   theme_classic(base_size = 15) +
   facet_wrap(vars(species), scales = "free_y") + 
   geom_line(aes(x = Year, y = fit)) + 
-  geom_ribbon(aes(x = Year, ymin = fit-se, ymax = fit+se), alpha = 0.2)
+  geom_ribbon(aes(x = Year, ymin = fit-se, ymax = fit+se), alpha = 0.2) + 
+  labs(y = "b")
 
 ```
 

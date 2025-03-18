@@ -9,7 +9,7 @@ Authors@R: c(
       role = c("aut", "cre")
     )
   )
-Description: A custom bounded Power-Law distribution to estimate the exponent of Individual Size Distribution (ISD) using Generalized Additive Mixed Models under the GAMLSS framework within the gamlss2 package functionality.
+Description: A custom bounded Power-Law distribution to estimate the exponent of Individual Size Distribution (ISD) using Generalized Additive Mixed Models under the GAMLSS framework within the functionality of the gamlss2 package.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Imports: gamlss2

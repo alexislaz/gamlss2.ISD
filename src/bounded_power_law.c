@@ -95,7 +95,7 @@ SEXP hess_bpl(SEXP y, SEXP mu, SEXP c, SEXP l, SEXP u)
       e9 = e8 - e6;
       pans[i] = -(pc[i % nc] * ((e1 * (e3 * pow(e5, 2) - (pow(e9, 2)/e7 + e2 * pow(e4, 2))) + e8 - e6)/e7 + (1 - e1 * e9/e7)/e1)/e1);
 
-      pans[i] = -pans[i];
+      pans[i] = -pans[i]; //return negative second derivative
     } else {
       pans[i] = 0.0;
     }
