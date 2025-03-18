@@ -121,7 +121,8 @@ SEXP loglik_bpl(SEXP y, SEXP mu, SEXP c, SEXP l, SEXP u)
     if(pmu[i % nmu] != -1) {
       pans[i] = pc[i % nc] * log((pmu[i % nmu] + 1)/(pow(pu[i % nu], pmu[i % nmu] + 1) - pow(pl[i % nl], pmu[i % nmu] + 1))) + pmu[i % nmu] * pc[i % nc] * log(py[i % ny]);
     } else {
-      pans[i] =  -pc[i % nc] * log(log(pu[i % nu]) - log(pl[i % nl])) - pc[i % nc] * log(py[i % ny]);
+      pans[i] = -pc[i % nc] * log(log(pu[i % nu]) - log(pl[i % nl])) - pc[i % nc] * log(py[i % ny]);
+      //pans[i] = pc[i % nc] * (log(log(pl[i % nl]) - log(pu[i % nu])) + pmu[i % nmu] * log(py[i % ny]));
     }
   }
 
