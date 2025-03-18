@@ -14,8 +14,13 @@
 #'
 #' @examples
 #'
-#' # simulate a dataset of 1000 sizes coming from an ISD with b = -2, and range of sizes bounded between 1 and 1000
-#' d = data.frame(size = rPLB(1000, -2, 1, 1000))
+#' # simulate a dataset of 1000 sizes coming from an ISD with
+#' # b = -2, and range of sizes bounded between 1 and 1000
+#'
+#' # 1) either use sizeSpectra::rPLB
+#' d = data.frame(size = sizeSpectra::rPLB(1e4, -2, 1, 1000))
+#' # 2) or, alternatively, use `bPL()$r`
+#' d = data.frame(size = bPL(1, 1, 1000)$r(1e4, list(mu = -2)))
 #'
 #' # estimate the exponent 'b'
 #' m = gamlss2(size ~ 1, data = d, family = bPL(counts = 1, lower = 1, upper = 1000))
