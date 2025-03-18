@@ -14,3 +14,5 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 Imports: gamlss2
 LazyData: true
+URL: https://github.com/alexislaz/gamlss2.ISD
+BugReports: https://github.com/alexislaz/gamlss2.ISD/issues
