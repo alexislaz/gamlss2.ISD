@@ -199,3 +199,46 @@ coef(specials(m)$model)[, 2] + coef(m)[2]
 # the actual slope is:
 slope
 ```
+
+## References
+
+<div id="refs" class="references csl-bib-body hanging-indent"
+entry-spacing="0">
+
+<div id="ref-26dbcc1d-72d2-3940-bff0-891fe87c4e21" class="csl-entry">
+
+Edwards, Andrew M., James P. W. Robinson, Julia L. Blanchard, Julia K.
+Baum, and Michael J. Plank. 2020. “Accounting for the Bin Structure of
+Data Removes Bias When Fitting Size Spectra.” *Marine Ecology Progress
+Series* 636: pp. 19–33. <https://www.jstor.org/stable/26920653>.
+
+</div>
+
+<div id="ref-https://doi.org/10.1111/2041-210X.12641" class="csl-entry">
+
+Edwards, Andrew M., James P. W. Robinson, Michael J. Plank, Julia K.
+Baum, and Julia L. Blanchard. 2017. “Testing and Recommending Methods
+for Fitting Size Spectra to Data.” *Methods in Ecology and Evolution* 8
+(1): 57–67. https://doi.org/<https://doi.org/10.1111/2041-210X.12641>.
+
+</div>
+
+<div id="ref-10.1111/j.1467-9876.2005.00510.x" class="csl-entry">
+
+Rigby, R. A., and D. M. Stasinopoulos. 2005. “Generalized Additive
+Models for Location, Scale and Shape.” *Journal of the Royal Statistical
+Society Series C: Applied Statistics* 54 (3): 507–54.
+<https://doi.org/10.1111/j.1467-9876.2005.00510.x>.
+
+</div>
+
+<div id="ref-https://doi.org/10.1111/2041-210X.14312" class="csl-entry">
+
+Wesner, Jeff S., Justin P. F. Pomeranz, James R. Junker, and Vojsava
+Gjoni. 2024. “Bayesian Hierarchical Modelling of Size Spectra.” *Methods
+in Ecology and Evolution* 15 (5): 856–67.
+https://doi.org/<https://doi.org/10.1111/2041-210X.14312>.
+
+</div>
+
+</div>
