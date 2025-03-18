@@ -1,0 +1,3 @@
+import(gamlss2)
+useDynLib(gamlss2.ISD)
+export(bPL)

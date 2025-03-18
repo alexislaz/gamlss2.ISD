@@ -1,0 +1,16 @@
+Package: gamlss2.ISD
+Type: Package
+Title: Modeling of size spectra with gamlss2
+Version: 0.1.0
+Authors@R: c(
+    person(
+      "Alexis", "Lazaris",
+      email = "alexislaz@upatras.gr",
+      role = c("aut", "cre")
+    )
+  )
+Description: A custom bounded Power-Law distribution to estimate the exponent of Individual Size Distribution (ISD) using Generalized Additive Mixed Models under the GAMLSS framework within the gamlss2 package functionality.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Imports: gamlss2
+LazyData: true
