@@ -14,7 +14,7 @@ bPL(counts, lower, upper)
 \item{upper}{Highest size limit (does not need to equal `max(size)`)}
 }
 \value{
-A `gamlss2` family object
+A `gamlss2.family` object
 }
 \description{
 `bPL` returns a distribution function for ISD described as a bounded Power-Law distribution (bPL) in
@@ -22,7 +22,14 @@ Edwards et al. 2017. `bPL` is defined by only one parameter (defined as `mu` her
 as described in Edwards et al. 2017. When fitting with `gamlss2`, estimate for `mu` is returned.
 }
 \examples{
-NA
+
+# simulate a dataset of 1000 sizes coming from an ISD with b = -2, and range of sizes bounded between 1 and 1000
+d = data.frame(size = rPLB(1000, -2, 1, 1000))
+
+# estimate the exponent 'b'
+m = gamlss2(size ~ 1, data = d, family = bPL(counts = 1, lower = 1, upper = 1000))
+
+summary(m)
 
 }
 \references{
