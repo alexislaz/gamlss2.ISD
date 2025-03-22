@@ -18,23 +18,40 @@ A `gamlss2.family` object
 }
 \description{
 `bPL` returns a distribution function for ISD described as a bounded Power-Law distribution (bPL) in
-Edwards et al. 2017. `bPL` is defined by only one parameter (defined as `mu` here) which is equivalent to 'b'
-as described in Edwards et al. 2017. When fitting with `gamlss2`, estimate for `mu` is returned.
+Edwards et al. 2017. `bPL` is defined by only one parameter (defined as `b` here) which is equivalent to 'b'
+as described in Edwards et al. 2017. When fitting with `gamlss2`, an estimate for `b` is returned.
 }
 \examples{
+
+# For these examples we need the `sizeSpetra` package.
+# remotes::install_github("andrew-edwards/sizeSpectra")
+# Note, though, that `sizeSpectra` is not needed for `gamlss2.ISD` in general.
 
 # simulate a dataset of 1000 sizes coming from an ISD with
 # b = -2, and range of sizes bounded between 1 and 1000
 
 # 1) either use sizeSpectra::rPLB
 d = data.frame(size = sizeSpectra::rPLB(1e4, -2, 1, 1000))
-# 2) or, alternatively, use `bPL()$r`
-d = data.frame(size = bPL(1, 1, 1000)$r(1e4, list(mu = -2)))
+# 2) or, alternatively, use `bPL()$r` (by accessing the `$r` function of `bPL`)
+d = data.frame(size = bPL(1, 1, 1000)$r(1e4, list(b = -2)))
 
 # estimate the exponent 'b'
-m = gamlss2(size ~ 1, data = d, family = bPL(counts = 1, lower = 1, upper = 1000))
+m = gamlss2(size ~ 1,
+            data = d,
+            family = bPL(counts = 1, lower = 1, upper = 1000))
 
 summary(m)
+
+# If data is in binned form; i.e.:
+bin.d = sizeSpectra::binData(d$size, binWidth = "2k")$binVals
+
+# We can, also, use a 2-column matrix for the response:
+bin.m = gamlss2(cbind(binMin, binMax) ~ 1,
+                data = bin.d,
+                family = bPL(counts = bin.d$binCount, lower = min(bin.d$binMin), upper = max(bin.d$binMax)))
+
+
+summary(bin.m)
 
 }
 \references{
