@@ -9,12 +9,19 @@
 #define MAX3(x1, x2, x3) MAX2(MAX2((x1), (x2)), (x3))
 #define MAX4(x1, x2, x3, x4) MAX2(MAX3((x1), (x2), (x3)), (x4))
 #define MAX5(x1, x2, x3, x4, x5) MAX2(MAX4((x1), (x2), (x3), (x4)), (x5))
+#define CHECK_NUMERIC_INPUT(x, fun, arg) if( !( (Rf_isReal((x)) || Rf_isInteger((x))) && (LENGTH(x) > 0) ) ) Rf_error("(in '%s') argument '%s' is not 'numeric' with 'length' >= 1\n", (fun), (arg))
 
 
 
 // adapted from Edwards et al. 2017 (sizeSpectra::negLL.PLB.counts)
 SEXP loglik_bpl(SEXP y, SEXP b, SEXP c, SEXP l, SEXP u)
 {
+  CHECK_NUMERIC_INPUT(y, "loglik_bpl", "y");
+  CHECK_NUMERIC_INPUT(b, "loglik_bpl", "b");
+  CHECK_NUMERIC_INPUT(c, "loglik_bpl", "c");
+  CHECK_NUMERIC_INPUT(l, "loglik_bpl", "l");
+  CHECK_NUMERIC_INPUT(u, "loglik_bpl", "u");
+
   int ny = LENGTH(y), nb = LENGTH(b), nc = LENGTH(c), nl = LENGTH(l), nu = LENGTH(u);
   int N = MAX5(ny, nb, nc, nl, nu);
 
@@ -39,6 +46,13 @@ SEXP loglik_bpl(SEXP y, SEXP b, SEXP c, SEXP l, SEXP u)
 // adapted from sizeSpectra::negLL.PLB.bins.species
 SEXP loglik_bpl_binned(SEXP y1, SEXP y2, SEXP b, SEXP c, SEXP l, SEXP u)
 {
+  CHECK_NUMERIC_INPUT(y1, "loglik_bpl_binned", "y1");
+  CHECK_NUMERIC_INPUT(y2, "loglik_bpl_binned", "y2");
+  CHECK_NUMERIC_INPUT(b, "loglik_bpl_binned", "b");
+  CHECK_NUMERIC_INPUT(c, "loglik_bpl_binned", "c");
+  CHECK_NUMERIC_INPUT(l, "loglik_bpl_binned", "l");
+  CHECK_NUMERIC_INPUT(u, "loglik_bpl_binned", "u");
+
   int ny = LENGTH(y1), nb = LENGTH(b), nc = LENGTH(c), nl = LENGTH(l), nu = LENGTH(u);
   int N = MAX5(ny, nb, nc, nl, nu);
 
@@ -78,6 +92,13 @@ SEXP loglik_bpl_binned(SEXP y1, SEXP y2, SEXP b, SEXP c, SEXP l, SEXP u)
  */
 SEXP score_bpl_binned(SEXP y1, SEXP y2, SEXP b, SEXP c, SEXP l, SEXP u)
 {
+  CHECK_NUMERIC_INPUT(y1, "score_bpl_binned", "y1");
+  CHECK_NUMERIC_INPUT(y2, "score_bpl_binned", "y2");
+  CHECK_NUMERIC_INPUT(b, "score_bpl_binned", "b");
+  CHECK_NUMERIC_INPUT(c, "score_bpl_binned", "c");
+  CHECK_NUMERIC_INPUT(l, "score_bpl_binned", "l");
+  CHECK_NUMERIC_INPUT(u, "score_bpl_binned", "u");
+
   int ny = LENGTH(y1), nb = LENGTH(b), nc = LENGTH(c), nl = LENGTH(l), nu = LENGTH(u);
   int N = MAX5(ny, nb, nc, nl, nu);
 
@@ -114,6 +135,12 @@ SEXP score_bpl_binned(SEXP y1, SEXP y2, SEXP b, SEXP c, SEXP l, SEXP u)
 // computed using Deriv::Deriv(<loglik_bpl> for = -1 and != -1, respectively)
 SEXP score_bpl(SEXP y, SEXP b, SEXP c, SEXP l, SEXP u)
 {
+  CHECK_NUMERIC_INPUT(y, "score_bpl", "y");
+  CHECK_NUMERIC_INPUT(b, "score_bpl", "b");
+  CHECK_NUMERIC_INPUT(c, "score_bpl", "c");
+  CHECK_NUMERIC_INPUT(l, "score_bpl", "l");
+  CHECK_NUMERIC_INPUT(u, "score_bpl", "u");
+
   int ny = LENGTH(y), nb = LENGTH(b), nc = LENGTH(c), nl = LENGTH(l), nu = LENGTH(u);
   int N = MAX5(ny, nb, nc, nl, nu);
 
@@ -146,6 +173,13 @@ SEXP score_bpl(SEXP y, SEXP b, SEXP c, SEXP l, SEXP u)
  */
 SEXP hess_bpl_binned(SEXP y1, SEXP y2, SEXP b, SEXP c, SEXP l, SEXP u)
 {
+  CHECK_NUMERIC_INPUT(y1, "hess_bpl_binned", "y1");
+  CHECK_NUMERIC_INPUT(y2, "hess_bpl_binned", "y2");
+  CHECK_NUMERIC_INPUT(b, "hess_bpl_binned", "b");
+  CHECK_NUMERIC_INPUT(c, "hess_bpl_binned", "c");
+  CHECK_NUMERIC_INPUT(l, "hess_bpl_binned", "l");
+  CHECK_NUMERIC_INPUT(u, "hess_bpl_binned", "u");
+
   int ny = LENGTH(y1), nb = LENGTH(b), nc = LENGTH(c), nl = LENGTH(l), nu = LENGTH(u);
   int N = MAX5(ny, nb, nc, nl, nu);
 
@@ -189,6 +223,12 @@ SEXP hess_bpl_binned(SEXP y1, SEXP y2, SEXP b, SEXP c, SEXP l, SEXP u)
 // computed using Deriv::Deriv(Deriv::Deriv(<loglik_bpl> for = -1 and != -1, respectively))
 SEXP hess_bpl(SEXP y, SEXP b, SEXP c, SEXP l, SEXP u)
 {
+  CHECK_NUMERIC_INPUT(y, "hess_bpl", "y");
+  CHECK_NUMERIC_INPUT(b, "hess_bpl", "b");
+  CHECK_NUMERIC_INPUT(c, "hess_bpl", "c");
+  CHECK_NUMERIC_INPUT(l, "hess_bpl", "l");
+  CHECK_NUMERIC_INPUT(u, "hess_bpl", "u");
+
   int ny = LENGTH(y), nb = LENGTH(b), nc = LENGTH(c), nl = LENGTH(l), nu = LENGTH(u);
   int N = MAX5(ny, nb, nc, nl, nu);
 
@@ -256,6 +296,11 @@ SEXP d_bpl(SEXP y, SEXP b, SEXP l, SEXP u)
 // adapted from sizeSpectra::dPLB
 SEXP d_bpl(SEXP y, SEXP b, SEXP l, SEXP u)
 {
+  CHECK_NUMERIC_INPUT(y, "d_bpl", "y");
+  CHECK_NUMERIC_INPUT(b, "d_bpl", "b");
+  CHECK_NUMERIC_INPUT(l, "d_bpl", "l");
+  CHECK_NUMERIC_INPUT(u, "d_bpl", "u");
+
   int ny = LENGTH(y), nb = LENGTH(b), nl = LENGTH(l), nu = LENGTH(u);
   int N = MAX4(ny, nb, nl, nu);
 
@@ -294,6 +339,11 @@ SEXP d_bpl(SEXP y, SEXP b, SEXP l, SEXP u)
  */
 SEXP init_bpl(SEXP y, SEXP c, SEXP l, SEXP u)
 {
+  CHECK_NUMERIC_INPUT(y, "init_bpl", "y");
+  CHECK_NUMERIC_INPUT(c, "init_bpl", "c");
+  CHECK_NUMERIC_INPUT(l, "init_bpl", "l");
+  CHECK_NUMERIC_INPUT(u, "init_bpl", "u");
+
   int ny = LENGTH(y), nc = LENGTH(c), nl = LENGTH(l), nu = LENGTH(u);
   int N = MAX4(ny, nc, nl, nu);
 
@@ -330,6 +380,12 @@ SEXP init_bpl(SEXP y, SEXP c, SEXP l, SEXP u)
 
 SEXP init_bpl_binned(SEXP y1, SEXP y2, SEXP c, SEXP l, SEXP u)
 {
+  CHECK_NUMERIC_INPUT(y1, "init_bpl_binned", "y1");
+  CHECK_NUMERIC_INPUT(y2, "init_bpl_binned", "y2");
+  CHECK_NUMERIC_INPUT(c, "init_bpl_binned", "c");
+  CHECK_NUMERIC_INPUT(l, "init_bpl_binned", "l");
+  CHECK_NUMERIC_INPUT(u, "init_bpl_binned", "u");
+
   int ny = LENGTH(y1), nc = LENGTH(c), nl = LENGTH(l), nu = LENGTH(u);
   int N = MAX4(ny, nc, nl, nu);
 
@@ -358,6 +414,12 @@ SEXP init_bpl_binned(SEXP y1, SEXP y2, SEXP c, SEXP l, SEXP u)
 // load 'rand' directly from R to avoid messing with random number generation in C
 SEXP r_bpl(SEXP n, SEXP b, SEXP l, SEXP u, SEXP rand)
 {
+  CHECK_NUMERIC_INPUT(n, "r_bpl", "n");
+  CHECK_NUMERIC_INPUT(b, "r_bpl", "b");
+  CHECK_NUMERIC_INPUT(l, "r_bpl", "l");
+  CHECK_NUMERIC_INPUT(u, "r_bpl", "u");
+  CHECK_NUMERIC_INPUT(rand, "r_bpl", "rand");
+
   int N = INTEGER(n)[0];
   int nb = LENGTH(b), nl = LENGTH(l), nu = LENGTH(u), nrand = LENGTH(rand);
 
@@ -385,6 +447,11 @@ SEXP r_bpl(SEXP n, SEXP b, SEXP l, SEXP u, SEXP rand)
 // adapted from 'sizeSpectra::qPLB'
 SEXP q_bpl(SEXP p, SEXP b, SEXP l, SEXP u)
 {
+  CHECK_NUMERIC_INPUT(p, "q_bpl", "p");
+  CHECK_NUMERIC_INPUT(b, "q_bpl", "b");
+  CHECK_NUMERIC_INPUT(l, "q_bpl", "l");
+  CHECK_NUMERIC_INPUT(u, "q_bpl", "u");
+
   int np = LENGTH(p), nb = LENGTH(b), nl = LENGTH(l), nu = LENGTH(u);
   int N = MAX4(np, nb, nl, nu);
 
@@ -412,6 +479,11 @@ SEXP q_bpl(SEXP p, SEXP b, SEXP l, SEXP u)
 // adapted from 'sizeSpectra::pPLB'
 SEXP p_bpl(SEXP y, SEXP b, SEXP l, SEXP u)
 {
+  CHECK_NUMERIC_INPUT(y, "p_bpl", "y");
+  CHECK_NUMERIC_INPUT(b, "p_bpl", "b");
+  CHECK_NUMERIC_INPUT(l, "p_bpl", "l");
+  CHECK_NUMERIC_INPUT(u, "p_bpl", "u");
+
   int ny = LENGTH(y), nb = LENGTH(b), nl = LENGTH(l), nu = LENGTH(u);
   int N = MAX4(ny, nb, nl, nu);
 
@@ -458,6 +530,12 @@ SEXP p_bpl(SEXP y, SEXP b, SEXP l, SEXP u)
  */
 SEXP p_bpl_binned(SEXP y1, SEXP y2, SEXP b, SEXP l, SEXP u)
 {
+  CHECK_NUMERIC_INPUT(y1, "p_bpl_binned", "y1");
+  CHECK_NUMERIC_INPUT(y2, "p_bpl_binned", "y2");
+  CHECK_NUMERIC_INPUT(b, "p_bpl_binned", "b");
+  CHECK_NUMERIC_INPUT(l, "p_bpl_binned", "l");
+  CHECK_NUMERIC_INPUT(u, "p_bpl_binned", "u");
+
   int ny = LENGTH(y1), nb = LENGTH(b), nl = LENGTH(l), nu = LENGTH(u);
   int N = MAX4(ny, nb, nl, nu);
 
