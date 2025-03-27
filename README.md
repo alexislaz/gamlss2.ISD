@@ -7,10 +7,10 @@ Alexis Lazaris
 # Overview
 
 The goal of gamlss2.ISD is to estimate the exponent of the Individual
-Size Distribution for size spectra as described with a bounded Power-Law
-distribution. The exponent can be estimated from raw body size data
-within the GAMLSS framework as applied by the `gamlss2` package. All the
-functionalities of the `gamlss2` package can be used.
+Size Distribution (ISD) for size spectra as described with a bounded
+Power-Law distribution. The exponent can be estimated from raw body size
+data within the GAMLSS framework as applied by the `gamlss2` package.
+All the functionalities of the `gamlss2` package can be used.
 
 # Installation
 
@@ -41,10 +41,36 @@ The main function of the `gamlss2.ISD` package is `bPL` that can be used
 inside a `gamlss2` call:
 
 ``` r
-gamlss2(size ~ fac + s(x1, x2) + s(x3, by = fac) + s(id, bs = "re"),
-        data = data,
-        family = bPL(data$counts, data$size_minima, data$size_maxima))
+gamlss2(<sizes> ~ fac + te(x, z) + s(w, by = fac) + s(id, bs = "re"),
+        data = <data>,
+        family = bPL(<number_of_observations>, <minimum_size>, <maximum_size>))
 ```
+
+which estimates the effects of covariates on the exponent (`b`) of the
+ISD.
+
+## Main variables
+
+- `<sizes>` can be a vector of individual measurements of size or it can
+  be a 2-column matrix of the bin ranges if data are collected in bins
+  (`cbind(bin_from, bin_to)`). Both cases are handled separately
+  internally with their respective likelihoods as developed by Edwards
+  et al. (2017) and Edwards et al. (2020), respectively.
+- `<number_of_observations>` can be a vector of
+  `length == length(sizes)` (or `length == nrow(sizes)`) that denotes
+  the number or, e.g., density of each observations and can be either an
+  integer or a decimal. Alternatively, it can simply be a `length == 1`
+  number when no such measurement exists (e.g. `bPL(counts = 1, ...)`).
+- `<minimum_size>` and `<maximum_size>` denote the range of sizes that
+  each observation is bounded in. It can either be a single number if
+  all observations have the same size limits of a vector of
+  `length == length(sizes)` (or `length == nrow(sizes)`) if different
+  size limits for, e.g., different groups are needed. In that case, we
+  need to prepare the data with an equivalent of
+  `data$minima = ave(data$size, data$group, FUN = min)` and use it as
+  `bPL(counts = .., lower = data$minima, upper = ...)`.
+- `<data>` is the dataset to look for `<sizes>` as well as the rhs
+  covariates.
 
 # Examples
 
@@ -57,7 +83,7 @@ library(gamlss2)
 library(sizeSpectra)
 
 library(brms)
-#devtools::install_github("jswesner/isdbayes")
+#devtools::install_github("jswesner/isdbayes") # a bayesian alternative to estimate within the ISD
 library(isdbayes)
 
 library(gamlss2.ISD)
@@ -86,19 +112,19 @@ summary(m)
 #> gamlss2(formula = size ~ 1, data = d, family = bPL(1, 1, 1000))
 #> ---
 #> Family: bPL 
-#> Link function: mu = identity
+#> Link function: b = identity
 #> *--------
-#> Parameter: mu 
+#> Parameter: b 
 #> ---
 #> Coefficients:
 #>             Estimate Std. Error t value Pr(>|t|)    
-#> (Intercept)  -2.0277     0.0332  -61.08   <2e-16 ***
+#> (Intercept) -1.98071    0.03186  -62.17   <2e-16 ***
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> *--------
 #> n = 1000 df =  1 res.df =  999
-#> Deviance = 3866.4214 Null Dev. Red. = 0%
-#> AIC = 3868.4214 elapsed =  0.00sec
+#> Deviance = 4044.7265 Null Dev. Red. = 0%
+#> AIC = 4046.7265 elapsed =  0.01sec
 ```
 
 ## Estimate the ISD exponent from multiple populations
@@ -143,7 +169,7 @@ Timing:
 
 ``` r
 summary(m)$elapsed # seconds of model fitting
-#> [1] 0.847
+#> [1] 0.839
 ```
 
 See the estimates:
@@ -151,9 +177,9 @@ See the estimates:
 ``` r
 predict(m, newdata = data.frame(pop = c("pop1", "pop2", "pop3")), se.fit = TRUE)
 #>            fit          se
-#> [1,] -1.203587 0.007649913
-#> [2,] -1.510790 0.009018004
-#> [3,] -1.836143 0.009548391
+#> [1,] -1.203280 0.007649465
+#> [2,] -1.508659 0.009011311
+#> [3,] -1.838063 0.009562694
 ```
 
 Alternatively, for faster fitting, we can aggregate equal sizes with
@@ -174,7 +200,7 @@ Reduced model fitting time:
 
 ``` r
 summary(m)$elapsed
-#> [1] 0.045
+#> [1] 0.049
 ```
 
 Identical estimates:
@@ -182,9 +208,9 @@ Identical estimates:
 ``` r
 predict(m, newdata = data.frame(pop = c("pop1", "pop2", "pop3")), se.fit = TRUE)
 #>            fit          se
-#> [1,] -1.203587 0.007649913
-#> [2,] -1.510790 0.009018004
-#> [3,] -1.836143 0.009548391
+#> [1,] -1.203280 0.007649465
+#> [2,] -1.508659 0.009011311
+#> [3,] -1.838063 0.009562694
 ```
 
 We can, also, utilize the random effects structure that `gamlss2`
@@ -201,9 +227,9 @@ Where we obtain similar estimates:
 ``` r
 predict(m, newdata = data.frame(pop = factor(levels(m$model$pop), levels(m$model$pop))), se.fit = TRUE)
 #>            fit          se
-#> [1,] -1.203856 0.007110699
-#> [2,] -1.510806 0.009327721
-#> [3,] -1.835768 0.009241094
+#> [1,] -1.203546 0.007110215
+#> [2,] -1.508678 0.009321382
+#> [3,] -1.837689 0.009254466
 ```
 
 And we can, also, visualize using the built-in `plot.gamlss2`:
@@ -468,6 +494,78 @@ ggplot(predictions) +
 ```
 
 ![](README_files/figure-gfm/ex4_eff-1.png)<!-- -->
+
+## Using binned data
+
+As a very simple example, we demonstrate the differences, in estimating
+the exponent of ISD from binned data, between using the middle value of
+the bin or the full range of the bin. We’ll use the
+`sizeSpectra::binData` utility function for this:
+
+``` r
+d = binData(rPLB(1e5, -1.5, 1, 100), binWidth = "2k")$binVals
+```
+
+And then estimate the exponent either the middle value (which is
+slightly off):
+
+``` r
+summary(
+  gamlss2(binMid ~ 1, 
+          data = d, 
+          family = bPL(d$binCount, min(d$binMid), max(d$binMid)))
+)
+#> GAMLSS-RS iteration  1: Global Deviance = 537254.9778 eps = 0.003052     
+#> GAMLSS-RS iteration  2: Global Deviance = 537254.9778 eps = 0.000000
+#> Call:
+#> gamlss2(formula = binMid ~ 1, data = d, family = bPL(d$binCount, 
+#>     min(d$binMid), max(d$binMid)))
+#> ---
+#> Family: bPL 
+#> Link function: b = identity
+#> *--------
+#> Parameter: b 
+#> ---
+#> Coefficients:
+#>             Estimate Std. Error t value Pr(>|t|)    
+#> (Intercept) -1.72492    0.00322  -535.8 2.85e-15 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> *--------
+#> n = 7 df =  1 res.df =  6
+#> Deviance = 537254.9778 Null Dev. Red. = 0%
+#> AIC = 537256.9778 elapsed =  0.00sec
+```
+
+or the bin range (which estimates ‘b’ more closely):
+
+``` r
+summary(
+  gamlss2(cbind(binMin, binMax) ~ 1, 
+          data = d, 
+          family = bPL(d$binCount, min(d$binMin), max(d$binMax)))
+)
+#> GAMLSS-RS iteration  1: Global Deviance = 343474.0638 eps = 0.004798     
+#> GAMLSS-RS iteration  2: Global Deviance = 343474.0638 eps = 0.000000
+#> Call:
+#> gamlss2(formula = cbind(binMin, binMax) ~ 1, data = d, family = bPL(d$binCount, 
+#>     min(d$binMin), max(d$binMax)))
+#> ---
+#> Family: bPL 
+#> Link function: b = identity
+#> *--------
+#> Parameter: b 
+#> ---
+#> Coefficients:
+#>              Estimate Std. Error t value Pr(>|t|)    
+#> (Intercept) -1.526475   0.002657  -574.5 1.88e-15 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> *--------
+#> n = 7 df =  1 res.df =  6
+#> Deviance = 343474.0638 Null Dev. Red. = 0%
+#> AIC = 343476.0638 elapsed =  0.00sec
+```
 
 ## References
 

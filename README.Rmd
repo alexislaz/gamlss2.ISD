@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 
 # Overview
 
-The goal of gamlss2.ISD is to estimate the exponent of the Individual Size Distribution for size spectra as described with a bounded Power-Law distribution. The exponent can be estimated from raw body size data within the GAMLSS framework as applied by the `gamlss2` package. All the functionalities of the `gamlss2` package can be used. 
+The goal of gamlss2.ISD is to estimate the exponent of the Individual Size Distribution (ISD) for size spectra as described with a bounded Power-Law distribution. The exponent can be estimated from raw body size data within the GAMLSS framework as applied by the `gamlss2` package. All the functionalities of the `gamlss2` package can be used. 
 
 # Installation
 
@@ -45,11 +45,18 @@ remotes::install_github("andrew-edwards/sizeSpectra")
 The main function of the `gamlss2.ISD` package is `bPL` that can be used inside a `gamlss2` call:
 
 ```{r use, eval = FALSE}
-gamlss2(size ~ fac + s(x1, x2) + s(x3, by = fac) + s(id, bs = "re"),
-        data = data,
-        family = bPL(data$counts, data$size_minima, data$size_maxima))
+gamlss2(<sizes> ~ fac + te(x, z) + s(w, by = fac) + s(id, bs = "re"),
+        data = <data>,
+        family = bPL(<number_of_observations>, <minimum_size>, <maximum_size>))
 ```
 
+which estimates the effects of covariates on the exponent (`b`) of the ISD. 
+
+## Main variables 
+* `<sizes>` can be a vector of individual measurements of size or it can be a 2-column matrix of the bin ranges if data are collected in bins (`cbind(bin_from, bin_to)`). Both cases are handled separately internally with their respective likelihoods as developed by @edwards2017 and @edwards2020, respectively.
+* `<number_of_observations>` can be a vector of `length == length(sizes)` (or `length == nrow(sizes)`) that denotes the number or, e.g., density of each observations and can be either an integer or a decimal. Alternatively, it can simply be a `length == 1` number when no such measurement exists (e.g. `bPL(counts = 1, ...)`).
+* `<minimum_size>` and `<maximum_size>` denote the range of sizes that each observation is bounded in. It can either be a single number if all observations have the same size limits of a vector of `length == length(sizes)` (or `length == nrow(sizes)`) if different size limits for, e.g., different groups are needed. In that case, we need to prepare the data with an equivalent of `data$minima = ave(data$size, data$group, FUN = min)` and use it as `bPL(counts = .., lower = data$minima, upper = ...)`.
+* `<data>` is the dataset to look for `<sizes>` as well as the rhs covariates. 
 
 # Examples
 
@@ -61,7 +68,7 @@ library(gamlss2)
 library(sizeSpectra)
 
 library(brms)
-#devtools::install_github("jswesner/isdbayes")
+#devtools::install_github("jswesner/isdbayes") # a bayesian alternative to estimate within the ISD
 library(isdbayes)
 
 library(gamlss2.ISD)
@@ -400,6 +407,32 @@ ggplot(predictions) +
 
 ```
 
+## Using binned data
+As a very simple example, we demonstrate the differences, in estimating the exponent of ISD from binned data, between using the middle value of the bin or the full range of the bin. We'll use the `sizeSpectra::binData` utility function for this:
+
+```{r ex_bin_r, message = FALSE, warning = FALSE, include = TRUE}
+d = binData(rPLB(1e5, -1.5, 1, 100), binWidth = "2k")$binVals
+```
+
+And then estimate the exponent either the middle value (which is slightly off):
+
+```{r ex_bin_m_mid, message = FALSE, warning = FALSE, include = TRUE}
+summary(
+  gamlss2(binMid ~ 1, 
+          data = d, 
+          family = bPL(d$binCount, min(d$binMid), max(d$binMid)))
+)
+```
+
+or the bin range (which estimates 'b' more closely):
+
+```{r ex_bin_m_bin, message = FALSE, warning = FALSE, include = TRUE}
+summary(
+  gamlss2(cbind(binMin, binMax) ~ 1, 
+          data = d, 
+          family = bPL(d$binCount, min(d$binMin), max(d$binMax)))
+)
+```
 
 
 
