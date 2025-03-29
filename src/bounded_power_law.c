@@ -351,15 +351,17 @@ SEXP init_bpl(SEXP y, SEXP c, SEXP l, SEXP u)
   PROTECT(ans = Rf_allocVector(REALSXP, N));
 
   double *py = REAL(y), *pc = REAL(c), *pl = REAL(l), *pu = REAL(u), *pans = REAL(ans);
-  double sumc = 0.0, sumclogy = 0.0;
+  double sumc = 0.0, sumclogy = 0.0, l1 = R_PosInf;
 
   for(int i = 0; i < N; i++) {
     sumc += pc[i % nc];
     sumclogy += pc[i % nc] * log(py[i % ny]);
+    l1 = (pl[i % nl] < l1) ? pl[i % nl] : l1;
   }
 
   for(int i = 0; i < N; i++) {
-    pans[i] = 1 / (log(pl[i % nl]) - sumclogy / sumc) - 1;
+    //pans[i] = 1 / (log(pl[i % nl]) - sumclogy / sumc) - 1;
+    pans[i] = 1 / (log(l1) - sumclogy / sumc) - 1;
   }
 
   UNPROTECT(1);
@@ -393,15 +395,17 @@ SEXP init_bpl_binned(SEXP y1, SEXP y2, SEXP c, SEXP l, SEXP u)
   PROTECT(ans = Rf_allocVector(REALSXP, N));
 
   double *py1 = REAL(y1), *py2 = REAL(y2), *pc = REAL(c), *pl = REAL(l), *pu = REAL(u), *pans = REAL(ans);
-  double sumc = 0.0, sumclogmids = 0.0;
+  double sumc = 0.0, sumclogmids = 0.0, l1 = R_PosInf;
 
   for(int i = 0; i < N; i++) {
     sumc += pc[i % nc];
     sumclogmids += pc[i % nc] * log( (py1[i % ny] + py2[i % ny]) / 2 );
+    l1 = (pl[i % nl] < l1) ? pl[i % nl] : l1;
   }
 
   for(int i = 0; i < N; i++) {
-    pans[i] = 1 / ( log(pl[i % nl]) - sumclogmids / sumc ) - 1;
+    //pans[i] = 1 / ( log(pl[i % nl]) - sumclogmids / sumc ) - 1;
+    pans[i] = 1 / ( log(l1) - sumclogmids / sumc ) - 1;
   }
 
   UNPROTECT(1);
