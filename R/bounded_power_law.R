@@ -94,13 +94,15 @@ bPL = function(counts, lower, upper)
                   as.numeric(y),
                   as.numeric(par$b),
                   as.numeric(counts),
-                  as.numeric(lower), as.numeric(upper)))
+                  as.numeric(lower), as.numeric(upper)),
+            na.rm = TRUE)
       } else {
         sum(.Call("loglik_bpl_binned",
                   as.numeric(y[, 1]), as.numeric(y[, 2]),
                   as.numeric(par$b),
                   as.numeric(counts),
-                  as.numeric(lower), as.numeric(upper)))
+                  as.numeric(lower), as.numeric(upper)),
+            na.rm = TRUE)
       }
     },
     "b" = function(par, ...) {
