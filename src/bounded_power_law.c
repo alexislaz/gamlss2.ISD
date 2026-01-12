@@ -342,7 +342,7 @@ SEXP d_bpl_log(SEXP y, SEXP b, SEXP l, SEXP u)
     }
     if(pb[i % nb] != -1) {
       logC = log(fabs(pb[i % nb] + 1)) - log( fabs( R_pow(pu[i % nu], pb[i % nb] + 1) - R_pow(pl[i % nl], pb[i % nb] + 1) ) );
-      pans[i] = logC + pb[i % nb] * py[i % ny];
+      pans[i] = logC + pb[i % nb] * log(py[i % ny]);
     } else {
       pans[i] = -log(py[i % ny]) - log( log(pu[i % nu]) - log(pl[i % nl]) );
     }
