@@ -54,6 +54,7 @@ bPL = function(counts, lower, upper)
     "family" = "bPL",
     "names" = "b",
     "links" = c("b" = "identity"),
+    "type" = "continuous",
     "score" = list(
       "b" = function(y, par, ...) {
         if(NCOL(y) == 1) {
@@ -105,18 +106,39 @@ bPL = function(counts, lower, upper)
             na.rm = TRUE)
       }
     },
+    # needs "logLik" instead of "loglik" in newer versions of 'gamlss2'
+    "logLik" = function(y, par, ...) {
+      if(NCOL(y) == 1) {
+        sum(.Call("loglik_bpl",
+                  as.numeric(y),
+                  as.numeric(par$b),
+                  as.numeric(counts),
+                  as.numeric(lower), as.numeric(upper)),
+            na.rm = TRUE)
+      } else {
+        sum(.Call("loglik_bpl_binned",
+                  as.numeric(y[, 1]), as.numeric(y[, 2]),
+                  as.numeric(par$b),
+                  as.numeric(counts),
+                  as.numeric(lower), as.numeric(upper)),
+            na.rm = TRUE)
+      }
+    },
     "b" = function(par, ...) {
       par$b
     },
-    "d" = function(y, par, log = FALSE) {
-      stop("used 'd'")
+    # "d" = ...
+    "pdf" = function(y, par, log = FALSE, ...) {
+      #stop("used 'd'")
       if(NCOL(y) == 2) y = y[, 1] #y = (y[, 1] + y[, 2]) / 2
       .Call("d_bpl",
             as.numeric(y),
             as.numeric(par$b),
-            as.numeric(lower), as.numeric(upper))
+            as.numeric(lower), as.numeric(upper),
+            as.logical(log))
     },
-    "p" = function(y, par, ...) {
+    # "p" = ...
+    "cdf" = function(y, par, ...) {
       if(NCOL(y) == 1) {
         .Call("p_bpl",
               as.numeric(y),
@@ -129,7 +151,8 @@ bPL = function(counts, lower, upper)
               as.numeric(lower), as.numeric(upper))
       }
     },
-    "r" = function(n, par) {
+    # "r" = ...
+    "random" = function(n, par, ...) {
       rand = stats::runif(n)
       .Call("r_bpl",
             as.integer(n),
@@ -137,7 +160,8 @@ bPL = function(counts, lower, upper)
             as.numeric(lower), as.numeric(upper),
             as.numeric(rand))
     },
-    "q" = function(p, par) {
+    # "q" = ...
+    "quantile" = function(p, par, ...) {
       .Call("q_bpl",
             as.numeric(p),
             as.numeric(par$b),

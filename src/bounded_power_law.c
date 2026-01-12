@@ -294,12 +294,15 @@ SEXP d_bpl(SEXP y, SEXP b, SEXP l, SEXP u)
 */
 
 // adapted from sizeSpectra::dPLB
-SEXP d_bpl(SEXP y, SEXP b, SEXP l, SEXP u)
+SEXP d_bpl(SEXP y, SEXP b, SEXP l, SEXP u, SEXP use_log)
 {
   CHECK_NUMERIC_INPUT(y, "d_bpl", "y");
   CHECK_NUMERIC_INPUT(b, "d_bpl", "b");
   CHECK_NUMERIC_INPUT(l, "d_bpl", "l");
   CHECK_NUMERIC_INPUT(u, "d_bpl", "u");
+
+  if( (!Rf_isLogical(use_log)) || (LOGICAL(use_log)[0] == NA_LOGICAL) ) Rf_error("argument 'log' is not of type \"logical\" in 'd_bpl'");
+  int uselog = LOGICAL(use_log)[0];
 
   int ny = LENGTH(y), nb = LENGTH(b), nl = LENGTH(l), nu = LENGTH(u);
   int N = MAX4(ny, nb, nl, nu);
@@ -313,15 +316,20 @@ SEXP d_bpl(SEXP y, SEXP b, SEXP l, SEXP u)
   for(int i = 0; i < N; i++) {
     if((py[i % ny] < pl[i % nl]) || (py[i % ny] > pu[i % nu])) {
       pans[i] = 0.0;
+
+      if(uselog) pans[i] = R_NegInf;
+
       continue;
     }
     if(pb[i % nb] != -1) {
-      C = (pb[i % nb] + 1) / ( R_pow(pu[i % nu], pb[i % nb] + 1) - R_pow(pl[i % nl], pb[i % nb] + 1) );pans[i] = (pb[i % nb] + 1) * R_pow(py[i % ny], pb[i % nb] + 1) / ( R_pow(pu[i % nu], pb[i % nb] + 1) - R_pow(pl[i % nl], pb[i % nb] + 1) );
+      C = (pb[i % nb] + 1) / ( R_pow(pu[i % nu], pb[i % nb] + 1) - R_pow(pl[i % nl], pb[i % nb] + 1) );
     } else {
       C = 1 / (log(pu[i % nu]) - log(pl[i % nl]));
     }
 
     pans[i] = C * R_pow(py[i % ny], pb[i % nb]);
+
+    if(uselog) pans[i] = log(pans[i]);
   }
 
   UNPROTECT(1);
