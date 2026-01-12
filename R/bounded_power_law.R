@@ -131,11 +131,18 @@ bPL = function(counts, lower, upper)
     "pdf" = function(y, par, log = FALSE, ...) {
       #stop("used 'd'")
       if(NCOL(y) == 2) y = y[, 1] #y = (y[, 1] + y[, 2]) / 2
-      .Call("d_bpl",
-            as.numeric(y),
-            as.numeric(par$b),
-            as.numeric(lower), as.numeric(upper),
-            as.logical(log))
+
+      if(log) {
+        .Call("d_bpl_log",
+              as.numeric(y),
+              as.numeric(par$b),
+              as.numeric(lower), as.numeric(upper))
+      } else {
+        .Call("d_bpl",
+              as.numeric(y),
+              as.numeric(par$b),
+              as.numeric(lower), as.numeric(upper))
+      }
     },
     # "p" = ...
     "cdf" = function(y, par, ...) {
