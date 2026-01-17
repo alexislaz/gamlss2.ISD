@@ -321,10 +321,10 @@ SEXP d_bpl(SEXP y, SEXP b, SEXP l, SEXP u)
 
 SEXP d_bpl_log(SEXP y, SEXP b, SEXP l, SEXP u)
 {
-  CHECK_NUMERIC_INPUT(y, "d_bpl", "y");
-  CHECK_NUMERIC_INPUT(b, "d_bpl", "b");
-  CHECK_NUMERIC_INPUT(l, "d_bpl", "l");
-  CHECK_NUMERIC_INPUT(u, "d_bpl", "u");
+  CHECK_NUMERIC_INPUT(y, "d_bpl_log", "y");
+  CHECK_NUMERIC_INPUT(b, "d_bpl_log", "b");
+  CHECK_NUMERIC_INPUT(l, "d_bpl_log", "l");
+  CHECK_NUMERIC_INPUT(u, "d_bpl_log", "u");
 
   int ny = LENGTH(y), nb = LENGTH(b), nl = LENGTH(l), nu = LENGTH(u);
   int N = MAX4(ny, nb, nl, nu);
@@ -596,6 +596,98 @@ SEXP p_bpl(SEXP y, SEXP b, SEXP l, SEXP u)
   return(ans);
 }
 
+
+/*
+ # A) p_bpl_log
+
+ # 1)  != -1
+
+ bp1 <- b + 1
+
+ term1 <- bp1 * (log(y) - log(u))
+
+ term2 <- log1p(- (l / y)^bp1)
+ term3 <- log1p(- (l / u)^bp1)
+
+ term1 + term2 - term3
+
+ # 2) == -1
+
+ log(log(y)−log(l))−log(log(u)−log(l))
+
+ # B) p_bpl_binned_log
+
+ # 1) != -1
+
+ bp1 <- b + 1
+
+ term1 <- bp1 * (log(y2) - log(u))
+
+ term2 <- log1p(- (y1 / y2)^bp1)
+ term3 <- log1p(- (l  / u )^bp1)
+
+ term1 + term2 - term3
+
+ # 2) == -1
+
+ log(log(y2)−log(y1))−log(log(u)−log(l))
+
+ */
+
+
+SEXP p_bpl_log(SEXP y, SEXP b, SEXP l, SEXP u)
+{
+  CHECK_NUMERIC_INPUT(y, "p_bpl_log", "y");
+  CHECK_NUMERIC_INPUT(b, "p_bpl_log", "b");
+  CHECK_NUMERIC_INPUT(l, "p_bpl_log", "l");
+  CHECK_NUMERIC_INPUT(u, "p_bpl_log", "u");
+
+  int ny = LENGTH(y), nb = LENGTH(b), nl = LENGTH(l), nu = LENGTH(u);
+  int N = MAX4(ny, nb, nl, nu);
+
+  SEXP ans;
+  PROTECT(ans = Rf_allocVector(REALSXP, N));
+
+  double *py = REAL(y), *pb = REAL(b), *pl = REAL(l), *pu = REAL(u), *pans = REAL(ans);
+  double bplus1, t1, t2, t3;
+
+  for(int i = 0; i < N; i++) {
+    if((pl[i % nl] <= 0) || (pl[i % nl] >= pu[i % nu])) {
+      //pans[i] = NA_REAL;
+      pans[i] = NA_REAL;
+      continue;
+    }
+
+    if(py[i % ny] < pl[i % nl]) {
+      //pans[i] = 0;
+      pans[i] = R_NegInf;
+      continue;
+    }
+
+    if(py[i % ny] > pu[i % nu]) {
+      //pans[i] = 1;
+      pans[i] = 0;
+      continue;
+    }
+
+    if(pb[i % nb] != -1) {
+      bplus1 = pb[i % nb] + 1;
+      t1 = bplus1 * (log(py[i % ny]) - log(pu[i % nu]));
+      t2 = log1p(- R_pow(pl[i % nl] / py[i % ny], bplus1));
+      t3 = log1p(- R_pow(pl[i % nl] / pu[i % nu], bplus1));
+
+      pans[i] = t1 + t2 - t3;
+    } else {
+      pans[i] = log(log(py[i % ny]) - log(pl[i % nl])) - log(log(pu[i % nu]) - log(pl[i % nl]));
+    }
+  }
+
+  UNPROTECT(1);
+  return(ans);
+}
+
+
+
 /*
  * adapted from
  *  https://www.int-res.com/articles/suppl/m636p019_supp1.pdf
@@ -645,6 +737,69 @@ SEXP p_bpl_binned(SEXP y1, SEXP y2, SEXP b, SEXP l, SEXP u)
 }
 
 
+SEXP d_bpl_binned(SEXP y1, SEXP y2, SEXP b, SEXP l, SEXP u)
+{
+  return(p_bpl_binned(y1, y2, b, l, u));
+}
+
+
+
+SEXP p_bpl_binned_log(SEXP y1, SEXP y2, SEXP b, SEXP l, SEXP u)
+{
+  CHECK_NUMERIC_INPUT(y1, "p_bpl_binned_log", "y1");
+  CHECK_NUMERIC_INPUT(y2, "p_bpl_binned_log", "y2");
+  CHECK_NUMERIC_INPUT(b, "p_bpl_binned_log", "b");
+  CHECK_NUMERIC_INPUT(l, "p_bpl_binned_log", "l");
+  CHECK_NUMERIC_INPUT(u, "p_bpl_binned_log", "u");
+
+  int ny = LENGTH(y1), nb = LENGTH(b), nl = LENGTH(l), nu = LENGTH(u);
+  int N = MAX4(ny, nb, nl, nu);
+
+  SEXP ans;
+  PROTECT(ans = Rf_allocVector(REALSXP, N));
+
+  double *py1 = REAL(y1), *py2 = REAL(y2), *pb = REAL(b), *pl = REAL(l), *pu = REAL(u), *pans = REAL(ans);
+  double bplus1, t1, t2, t3;
+
+  for(int i = 0; i < N; i++) {
+    if((pl[i % nl] <= 0) || (pl[i % nl] >= pu[i % nu])) {
+      //pans[i] = NA_REAL;
+      pans[i] = NA_REAL;
+      continue;
+    }
+
+    if(py1[i % ny] < pl[i % nl]) {
+      //pans[i] = 0;
+      pans[i] = R_NegInf;
+      continue;
+    }
+
+    if(py2[i % ny] > pu[i % nu]) {
+      //pans[i] = 1;
+      pans[i] = 0;
+      continue;
+    }
+
+    if(pb[i % nb] != -1) {
+      bplus1 = pb[i % nb] + 1;
+      t1 = bplus1 * (log(py2[i % ny]) - log(pu[i % nu]));
+      t2 = log1p(- R_pow(py1[i % ny] / py2[i % ny], bplus1));
+      t3 = log1p(- R_pow(pl[i % nl] / pu[i % nu], bplus1));
+
+      pans[i] = t1 + t2 - t3;
+    } else {
+      pans[i] = log( log(py2[i % ny]) - log(py1[i % ny]) ) - log( log(pu[i % nu]) - log(pl[i % nl]) );
+    }
+  }
+
+  UNPROTECT(1);
+  return(ans);
+}
+
+SEXP d_bpl_binned_log(SEXP y1, SEXP y2, SEXP b, SEXP l, SEXP u)
+{
+  return(p_bpl_binned_log(y1, y2, b, l, u));
+}
 
 
 

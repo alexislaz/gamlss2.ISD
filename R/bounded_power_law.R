@@ -130,18 +130,32 @@ bPL = function(counts, lower, upper)
     # "d" = ...
     "pdf" = function(y, par, log = FALSE, ...) {
       #stop("used 'd'")
-      if(NCOL(y) == 2) y = y[, 1] #y = (y[, 1] + y[, 2]) / 2
+      #if(NCOL(y) == 2) y = y[, 1] #y = (y[, 1] + y[, 2]) / 2
 
-      if(log) {
-        .Call("d_bpl_log",
-              as.numeric(y),
-              as.numeric(par$b),
-              as.numeric(lower), as.numeric(upper))
+      if(NCOL(y) == 2) {
+        if(log) {
+          .Call("d_bpl_binned_log",
+                as.numeric(y[, 1]), as.numeric(y[, 2]),
+                as.numeric(par$b),
+                as.numeric(lower), as.numeric(upper))
+        } else {
+          .Call("d_bpl_binned",
+                as.numeric(y[, 1]), as.numeric(y[, 2]),
+                as.numeric(par$b),
+                as.numeric(lower), as.numeric(upper))
+        }
       } else {
-        .Call("d_bpl",
-              as.numeric(y),
-              as.numeric(par$b),
-              as.numeric(lower), as.numeric(upper))
+        if(log) {
+          .Call("d_bpl_log",
+                as.numeric(y),
+                as.numeric(par$b),
+                as.numeric(lower), as.numeric(upper))
+        } else {
+          .Call("d_bpl",
+                as.numeric(y),
+                as.numeric(par$b),
+                as.numeric(lower), as.numeric(upper))
+        }
       }
     },
     # "p" = ...
