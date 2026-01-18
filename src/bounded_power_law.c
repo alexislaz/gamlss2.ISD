@@ -678,7 +678,7 @@ SEXP p_bpl_log(SEXP y, SEXP b, SEXP l, SEXP u)
       //t3 = log1p(- R_pow(pl[i % nl] / pu[i % nu], bplus1));
       t3 = log(fabs(1 - R_pow(pl[i % nl] / pu[i % nu], bplus1)));
 
-      Rprintf("(p_bpl_log) t1 = %.2f, t2 = %.2f, t3 = %.2f", t1, t2, t3);
+      //Rprintf("(p_bpl_log) t1 = %.2f, t2 = %.2f, t3 = %.2f\n", t1, t2, t3);
 
       pans[i] = t1 + t2 - t3;
     } else {
@@ -765,7 +765,7 @@ SEXP d_bpl_binned(SEXP y1, SEXP y2, SEXP b, SEXP l, SEXP u)
   for(int i = 0; i < N; i++) {
     pans[i] = pp_return[i] / (py2[i % n] - py1[i % n]);
 
-    Rprintf("(d_bpl_binned) p = %.2f, y[,2] - y[,1] = %.2f", pp_return[i], (py2[i % n] - py1[i % n]));
+    //Rprintf("(d_bpl_binned) p = %.2f, y[,2] - y[,1] = %.2f\n", pp_return[i], (py2[i % n] - py1[i % n]));
   }
 
   UNPROTECT(2);
@@ -818,7 +818,7 @@ SEXP p_bpl_binned_log(SEXP y1, SEXP y2, SEXP b, SEXP l, SEXP u)
       //t3 = log1p(- R_pow(pl[i % nl] / pu[i % nu], bplus1));
       t3 = log(fabs(1 - R_pow(pl[i % nl] / pu[i % nu], bplus1)));
 
-      Rprintf("(p_bpl_binned_log) t1 = %.2f, t2 = %.2f, t3 = %.2f", t1, t2, t3);
+      //Rprintf("(p_bpl_binned_log) t1 = %.2f, t2 = %.2f, t3 = %.2f\n", t1, t2, t3);
 
       pans[i] = t1 + t2 - t3;
     } else {
