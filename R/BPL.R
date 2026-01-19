@@ -49,14 +49,16 @@ BPL = function (counts, lower, upper, mu.link ="identity")
         .Call("score_bpl", as.numeric(y), as.numeric(mu),
               as.numeric(counts),
               as.numeric(lower),
-              as.numeric(upper))
+              as.numeric(upper),
+              PACKAGE = "gamlss2.ISD")
       }
       else {
         .Call("score_bpl_binned", as.numeric(y[, 1]), as.numeric(y[, 2]),
               as.numeric(mu),
               as.numeric(counts),
               as.numeric(lower),
-              as.numeric(upper))
+              as.numeric(upper),
+              PACKAGE = "gamlss2.ISD")
       }
     }
   }, list(
@@ -73,14 +75,16 @@ BPL = function (counts, lower, upper, mu.link ="identity")
         -1 * .Call("hess_bpl", as.numeric(y), as.numeric(mu),
                    as.numeric(counts),
                    as.numeric(lower),
-                   as.numeric(upper))
+                   as.numeric(upper),
+                   PACKAGE = "gamlss2.ISD")
       }
       else {
         -1 * .Call("hess_bpl_binned", as.numeric(y[, 1]), as.numeric(y[, 2]),
                    as.numeric(mu),
                    as.numeric(counts),
                    as.numeric(lower),
-                   as.numeric(upper))
+                   as.numeric(upper),
+                   PACKAGE = "gamlss2.ISD")
       }
     }
   }, list(
@@ -96,13 +100,15 @@ BPL = function (counts, lower, upper, mu.link ="identity")
         -2 * .Call("loglik_bpl", as.numeric(y), as.numeric(mu),
                    as.numeric(counts),
                    as.numeric(lower),
-                   as.numeric(upper))
+                   as.numeric(upper),
+                   PACKAGE = "gamlss2.ISD")
       }
       else {
         -2 * .Call("loglik_bpl_binned", as.numeric(y[, 1]), as.numeric(y[, 2]),
                    as.numeric(counts),
                    as.numeric(lower),
-                   as.numeric(upper))
+                   as.numeric(upper),
+                   PACKAGE = "gamlss2.ISD")
       }
     }
   }, list(
@@ -165,13 +171,15 @@ BPL = function (counts, lower, upper, mu.link ="identity")
                .Call("init_bpl", as.numeric(y),
                      as.numeric(counts),
                      as.numeric(lower),
-                     as.numeric(upper))
+                     as.numeric(upper),
+                     PACKAGE = "gamlss2.ISD")
              }
              else {
                .Call("init_bpl_binned", as.numeric(y[, 1]), as.numeric(y[, 2]),
                      as.numeric(counts),
                      as.numeric(lower),
-                     as.numeric(upper))
+                     as.numeric(upper),
+                     PACKAGE = "gamlss2.ISD")
              }
            }, list(
              counts = get("counts", envir = env),
