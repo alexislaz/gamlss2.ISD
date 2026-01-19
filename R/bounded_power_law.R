@@ -129,64 +129,72 @@ bPL = function(counts, lower, upper)
     },
     # "d" = ...
     "pdf" = function(y, par, log = FALSE, ...) {
-      #stop("used 'd'")
-      #if(NCOL(y) == 2) y = y[, 1] #y = (y[, 1] + y[, 2]) / 2
+      # stop("used 'd'")
+      # if(NCOL(y) == 2) y = y[, 1] #y = (y[, 1] + y[, 2]) / 2
 
-      if(NCOL(y) == 2) {
-        if(log) {
-          .Call("d_bpl_binned_log",
-                as.numeric(y[, 1]), as.numeric(y[, 2]),
-                as.numeric(par$b),
-                as.numeric(lower), as.numeric(upper))
-        } else {
-          .Call("d_bpl_binned",
-                as.numeric(y[, 1]), as.numeric(y[, 2]),
-                as.numeric(par$b),
-                as.numeric(lower), as.numeric(upper))
-        }
-      } else {
-        if(log) {
-          .Call("d_bpl_log",
-                as.numeric(y),
-                as.numeric(par$b),
-                as.numeric(lower), as.numeric(upper))
-        } else {
-          .Call("d_bpl",
-                as.numeric(y),
-                as.numeric(par$b),
-                as.numeric(lower), as.numeric(upper))
-        }
-      }
+      # if(NCOL(y) == 2) {
+      #   if(log) {
+      #     .Call("d_bpl_binned_log",
+      #           as.numeric(y[, 1]), as.numeric(y[, 2]),
+      #           as.numeric(par$b),
+      #           as.numeric(lower), as.numeric(upper))
+      #   } else {
+      #     .Call("d_bpl_binned",
+      #           as.numeric(y[, 1]), as.numeric(y[, 2]),
+      #           as.numeric(par$b),
+      #           as.numeric(lower), as.numeric(upper))
+      #   }
+      # } else {
+      #   if(log) {
+      #     .Call("d_bpl_log",
+      #           as.numeric(y),
+      #           as.numeric(par$b),
+      #           as.numeric(lower), as.numeric(upper))
+      #   } else {
+      #     .Call("d_bpl",
+      #           as.numeric(y),
+      #           as.numeric(par$b),
+      #           as.numeric(lower), as.numeric(upper))
+      #   }
+      # }
+
+      dbPL(x = y, b = par$b, lower = lower, upper = upper, log = log)
     },
     # "p" = ...
     "cdf" = function(y, par, ...) {
-      if(NCOL(y) == 1) {
-        .Call("p_bpl",
-              as.numeric(y),
-              as.numeric(par$b),
-              as.numeric(lower), as.numeric(upper))
-      } else {
-        .Call("p_bpl_binned",
-              as.numeric(y[, 1]), as.numeric(y[, 2]),
-              as.numeric(par$b),
-              as.numeric(lower), as.numeric(upper))
-      }
+      # if(NCOL(y) == 1) {
+      #   .Call("p_bpl",
+      #         as.numeric(y),
+      #         as.numeric(par$b),
+      #         as.numeric(lower), as.numeric(upper))
+      # } else {
+      #   .Call("p_bpl_binned",
+      #         as.numeric(y[, 1]), as.numeric(y[, 2]),
+      #         as.numeric(par$b),
+      #         as.numeric(lower), as.numeric(upper))
+      # }
+
+      pbPL(q = y, b = par$b, lower = lower, upper = upper, log = FALSE)
     },
     # "r" = ...
     "random" = function(n, par, ...) {
-      rand = stats::runif(n)
-      .Call("r_bpl",
-            as.integer(n),
-            as.numeric(par$b),
-            as.numeric(lower), as.numeric(upper),
-            as.numeric(rand))
+      # rand = stats::runif(n)
+      # .Call("r_bpl",
+      #       as.integer(n),
+      #       as.numeric(par$b),
+      #       as.numeric(lower), as.numeric(upper),
+      #       as.numeric(rand))
+
+      rbPL(n = n, b = par$b, lower = lower, upper = upper)
     },
     # "q" = ...
     "quantile" = function(p, par, ...) {
-      .Call("q_bpl",
-            as.numeric(p),
-            as.numeric(par$b),
-            as.numeric(lower), as.numeric(upper))
+      # .Call("q_bpl",
+      #       as.numeric(p),
+      #       as.numeric(par$b),
+      #       as.numeric(lower), as.numeric(upper))
+
+      qbPL(p = p, b = par$b, lower = lower, upper = upper)
     },
     "initialize" = list(
       "b" = function(y, ...) {
