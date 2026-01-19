@@ -16,4 +16,4 @@ Imports: gamlss2
 LazyData: true
 URL: https://github.com/alexislaz/gamlss2.ISD
 BugReports: https://github.com/alexislaz/gamlss2.ISD/issues
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
