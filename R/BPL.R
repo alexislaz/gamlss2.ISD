@@ -6,6 +6,8 @@
 #' @param lower Lowest size limit (does not need to equal `min(size)`)
 #' @param upper Highest size limit (does not need to equal `max(size)`)
 #' @param mu.link The exponent of ISD
+#' @param mu The exponent of ISD
+#' @param log use `log`?
 #'
 #' @return A `gamlss.family` object
 #'
