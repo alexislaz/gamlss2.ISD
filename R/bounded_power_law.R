@@ -10,6 +10,7 @@
 #'
 #' @return A `gamlss2.family` object
 #'
+#' @rdname bPL-gamlss2
 #' @export
 #'
 #' @examples

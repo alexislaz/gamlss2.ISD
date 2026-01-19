@@ -1,3 +1,7 @@
 import(gamlss2)
 useDynLib(gamlss2.ISD)
 export(bPL)
+export(dbPL)
+export(pbPL)
+export(qbPL)
+export(rbPL)

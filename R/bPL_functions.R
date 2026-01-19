@@ -23,7 +23,7 @@
 #' @references Edwards, A. M., Robinson, J. P. W., Blanchard, J. L., Baum, J. K., & Plank, M. J. (2020). Accounting for the bin structure of data removes bias when fitting size spectra. Marine Ecology Progress Series, 636, 19–33. https://www.jstor.org/stable/26920653
 #'
 
-
+#' @rdname bPL
 dbPL =function(x = 1, b = -2, lower = 1, upper = 100, log = FALSE)
 {
   if(NCOL(x) == 2) {
@@ -54,6 +54,7 @@ dbPL =function(x = 1, b = -2, lower = 1, upper = 100, log = FALSE)
 }
 
 
+#' @rdname bPL
 pbPL = function(q = 1, b = -2, lower = 1, upper = 100, log = FALSE)
 {
   if(NCOL(q) == 1) {
@@ -83,6 +84,7 @@ pbPL = function(q = 1, b = -2, lower = 1, upper = 100, log = FALSE)
   }
 }
 
+#' @rdname bPL
 qbPL = function(p = 0.1, b = -2, lower = 1, upper = 100)
 {
   .Call("q_bpl",
@@ -91,6 +93,7 @@ qbPL = function(p = 0.1, b = -2, lower = 1, upper = 100)
         as.numeric(lower), as.numeric(upper))
 }
 
+#' @rdname bPL
 rbPL = function(n = 1, b = -2, lower = 1, upper = 100)
 {
   rand = stats::runif(n)
