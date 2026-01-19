@@ -26,6 +26,10 @@ rBPL(n = 1, mu = -2, lower = 1, upper = 100)
 \item{upper}{Highest size limit (does not need to equal `max(size)`)}
 
 \item{mu.link}{The exponent of ISD}
+
+\item{mu}{The exponent of ISD}
+
+\item{log}{use `log`?}
 }
 \value{
 A `gamlss.family` object
